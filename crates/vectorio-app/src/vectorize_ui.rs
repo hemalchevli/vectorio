@@ -1369,6 +1369,8 @@ mod tests {
 
     #[test]
     fn the_colour_panel_sits_left_and_repaints_the_original_view() {
+        let _lock = crate::i18n::locale_lock();
+        rust_i18n::set_locale("es");
         let ctx = egui::Context::default();
         let doc = Document::default();
         let mut view = VectorizeUi::default();

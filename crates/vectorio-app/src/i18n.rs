@@ -77,7 +77,7 @@ mod tests {
         for entry in std::fs::read_dir(dir).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().is_none_or(|e| e != "rs") { continue; }
-            let text = std::fs::read_to_string(&path).unwrap();
+            let text = std::fs::read_to_string(&path).unwrap().replace("\r\n", "\n");
             // Las pruebas pueden usar textos propios: solo cuenta el código de la aplicación.
             let code = text.split("#[cfg(test)]").next().unwrap();
             let code: String = code.lines().filter(|l| !l.trim_start().starts_with("//")).collect::<Vec<_>>().join("\n");
@@ -105,7 +105,7 @@ mod tests {
         for entry in std::fs::read_dir(core).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().is_none_or(|e| e != "rs") { continue; }
-            let text = std::fs::read_to_string(&path).unwrap();
+            let text = std::fs::read_to_string(&path).unwrap().replace("\r\n", "\n");
             for marker in ["pub fn label(", "pub fn help("] {
                 let mut rest = text.as_str();
                 while let Some(i) = rest.find(marker) {
@@ -122,7 +122,7 @@ mod tests {
             }
         }
         // Nombres de serie del núcleo: tintas y tamaños de papel.
-        let doc = std::fs::read_to_string(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../vectorio-core/src/doc.rs")).unwrap();
+        let doc = std::fs::read_to_string(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../vectorio-core/src/doc.rs")).unwrap().replace("\r\n", "\n");
         let pens = doc.split("pub fn default_pens()").nth(1).unwrap().split("\n}\n").next().unwrap();
         let papers = doc.split("pub fn presets() -> Vec<Paper>").nth(1).unwrap().split("\n    }\n").next().unwrap();
         for (text, marker) in [(pens, "Pen::new(\""), (papers, "mk(\"")] {

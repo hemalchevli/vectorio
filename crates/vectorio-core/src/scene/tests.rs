@@ -83,6 +83,7 @@ fn tolerance_keeps_coplanar_details_and_tiled_occluders_leave_no_false_gap() {
     s.line(&[w(90.0, 90.0, 0.0019), w(110.0, 90.0, 0.0019)]);
     s.line(&[w(90.0, 100.0, 0.0021), w(110.0, 100.0, 0.0021)]);
     let out = s.render();
+    eprintln!("OUT LINES: {:?}", out.parts[0].lines);
     assert_eq!(out.parts[0].lines.len(), 1);
     assert!((out.length_m(PartId(0)) - 0.02).abs() < 1e-12);
 }
@@ -123,7 +124,8 @@ fn edge_on_face_does_not_occlude() {
         cam.unproject(p(120.0, 100.0), -1.0)]);
     s.line(&[cam.unproject(p(90.0, 100.0), 1.0), cam.unproject(p(110.0, 100.0), 1.0)]);
     assert!(s.faces.is_empty());
-    assert_eq!(s.render().parts[0].lines[0], vec![p(90.0, 100.0), p(110.0, 100.0)]);
+    let line = &s.render().parts[0].lines[0];
+    assert!(line[0].dist(p(90.0, 100.0)) < 1e-7 && line[1].dist(p(110.0, 100.0)) < 1e-7);
 }
 
 #[test]

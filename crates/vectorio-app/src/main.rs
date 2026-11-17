@@ -35,17 +35,27 @@ fn main() -> eframe::Result<()> {
     let icon = image::load_from_memory(png)
         .expect("El icono de Vectorio debe ser un PNG válido").into_rgba8();
     let icon = egui::IconData { width: icon.width(), height: icon.height(), rgba: icon.into_raw() };
+    #[cfg(target_os = "macos")]
+    let viewport = egui::ViewportBuilder::default()
+        .with_title("Vectorio")
+        .with_icon(icon)
+        .with_inner_size([1440.0, 900.0])
+        .with_min_inner_size([980.0, 620.0])
+        // Barra de herramientas unificada: el contenido llega bajo los botones de la ventana.
+        .with_fullsize_content_view(true)
+        .with_title_shown(false)
+        .with_titlebar_shown(false)
+        .with_drag_and_drop(true);
+
+    #[cfg(not(target_os = "macos"))]
+    let viewport = egui::ViewportBuilder::default()
+        .with_title("Vectorio")
+        .with_icon(icon)
+        .with_inner_size([1440.0, 900.0])
+        .with_min_inner_size([980.0, 620.0])
+        .with_drag_and_drop(true);
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_title("Vectorio")
-            .with_icon(icon)
-            .with_inner_size([1440.0, 900.0])
-            .with_min_inner_size([980.0, 620.0])
-            // Barra de herramientas unificada: el contenido llega bajo los botones de la ventana.
-            .with_fullsize_content_view(true)
-            .with_title_shown(false)
-            .with_titlebar_shown(false)
-            .with_drag_and_drop(true),
+        viewport,
         renderer: eframe::Renderer::Wgpu,
         ..Default::default()
     };

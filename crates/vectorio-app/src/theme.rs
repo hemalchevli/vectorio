@@ -36,6 +36,7 @@ pub const SHEET_PAD: f32 = 20.0;
 pub const INSET: f32 = 10.0;
 pub const TOOLBAR_H: f32 = 52.0;
 /// Hueco para los botones de cerrar/minimizar/ampliar.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
 pub const TRAFFIC_LIGHTS_W: f32 = 78.0;
 
 /// Colores con alfa «ingenuos»: premultiplicados en el espacio gamma, que es en el que

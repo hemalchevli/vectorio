@@ -132,18 +132,18 @@ impl Grid {
         let mut x = start.x.floor() as i64;
         let mut y = start.y.floor() as i64;
         let (sx, sy) = (if d.x >= 0.0 { 1 } else { -1 }, if d.y >= 0.0 { 1 } else { -1 });
-        let (dx, dy) = (if d.x.abs() < 1e-14 { f64::INFINITY } else { 1.0 / d.x.abs() },
-            if d.y.abs() < 1e-14 { f64::INFINITY } else { 1.0 / d.y.abs() });
-        let mut tx = if sx > 0 { (x as f64 + 1.0 - start.x) * dx } else { (start.x - x as f64) * dx };
-        let mut ty = if sy > 0 { (y as f64 + 1.0 - start.y) * dy } else { (start.y - y as f64) * dy };
+        let (dx, dy) = (if d.x.abs() < 1e-10 { f64::INFINITY } else { 1.0 / d.x.abs() },
+            if d.y.abs() < 1e-10 { f64::INFINITY } else { 1.0 / d.y.abs() });
+        let mut tx = if dx.is_infinite() { f64::INFINITY } else if sx > 0 { (x as f64 + 1.0 - start.x) * dx } else { (start.x - x as f64) * dx };
+        let mut ty = if dy.is_infinite() { f64::INFINITY } else if sy > 0 { (y as f64 + 1.0 - start.y) * dy } else { (start.y - y as f64) * dy };
         let mut cells = Vec::new();
         let mut add = |x: i64, y: i64| {
             if x >= 0 && y >= 0 && x < self.cols as i64 && y < self.rows as i64 { cells.push(y as usize * self.cols + x as usize); }
         };
         for _ in 0..self.cols + self.rows + 4 {
             add(x, y);
-            if d.x.abs() < 1e-14 && (start.x - start.x.round()).abs() < 1e-8 { add(x - 1, y); }
-            if d.y.abs() < 1e-14 && (start.y - start.y.round()).abs() < 1e-8 { add(x, y - 1); }
+            if d.x.abs() < 1e-10 && (start.x - start.x.round()).abs() < 1e-8 { add(x - 1, y); }
+            if d.y.abs() < 1e-10 && (start.y - start.y.round()).abs() < 1e-8 { add(x, y - 1); }
             if tx.min(ty) > 1.0 + 1e-10 { break; }
             if (tx - ty).abs() < 1e-10 { add(x + sx, y); add(x, y + sy); x += sx; y += sy; tx += dx; ty += dy; }
             else if tx < ty { x += sx; tx += dx; } else { y += sy; ty += dy; }

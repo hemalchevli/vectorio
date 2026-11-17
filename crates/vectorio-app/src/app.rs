@@ -786,6 +786,7 @@ impl VectorioApp {
             }
             ui.horizontal_centered(|ui| {
                 // Los semáforos son nativos y no siguen el tamaño de la interfaz.
+                #[cfg(target_os = "macos")]
                 ui.add_space(theme::TRAFFIC_LIGHTS_W / ui.ctx().zoom_factor());
                 let title = self
                     .file

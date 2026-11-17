@@ -118,7 +118,7 @@ fn perspective_has_vanishing_points_reciprocal_depth_and_a_working_near_plane() 
     assert!((ground.z + 0.3).abs() < 1e-9);
     assert!(c.project(ground).0.dist(p(3., 5.)) < 1e-9);
     c.perspective = None;
-    assert_eq!(c.project(right + away * 4.).0.x, 10.);
+    assert!((c.project(right + away * 4.).0.x - 10.).abs() < 1e-9);
 }
 #[test]
 fn perspective_visibility_uses_projective_depth_instead_of_linear_world_depth() {

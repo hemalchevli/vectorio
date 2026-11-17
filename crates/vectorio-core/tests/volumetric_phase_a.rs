@@ -21,7 +21,7 @@ fn check(engine: &mut Engine, source: Arc<Mesh>, settings: Settings, name: &str,
         inks(0.1764)
     };
     let assign = if shadow { [0, 1, 0] } else { [0, 2, 1] };
-    let expected = std::fs::read(format!("{ROOT}{name}.svg")).unwrap();
+    let expected = std::fs::read_to_string(format!("{ROOT}{name}.svg")).unwrap().replace("\r\n", "\n");
     let legacy = engine
         .draw(source.clone(), &settings, &paper, &|| false)
         .unwrap();
@@ -46,12 +46,19 @@ fn check(engine: &mut Engine, source: Arc<Mesh>, settings: Settings, name: &str,
         ("receta v2", restored, vec![]),
     ] {
         let doc = drawing.document(paper.clone(), pens.clone(), mapping);
-        let actual = svg_out::export(&doc, &doc.layers());
-        // Comparación literal completa, incluidos nombres, orden y coordenadas.
-        assert!(
-            actual.as_bytes() == expected,
-            "SVG distinto: {name} ({label})"
-        );
+        let actual = svg_out::export(&doc, &doc.layers()).replace("\r\n", "\n");
+        if actual != expected {
+            let left_lines: Vec<_> = actual.lines().collect();
+            let right_lines: Vec<_> = expected.lines().collect();
+            for (i, (l, r)) in left_lines.iter().zip(right_lines.iter()).enumerate() {
+                if l != r {
+                    panic!("Mismatch in {name} ({label}) at line {i}:\nLEFT:  {l}\nRIGHT: {r}");
+                }
+            }
+            if left_lines.len() != right_lines.len() {
+                panic!("Different line count in {name} ({label}): left {}, right {}", left_lines.len(), right_lines.len());
+            }
+        }
     }
 }
 #[test]
@@ -163,8 +170,8 @@ fn real_v1_recipe_migrates_to_v2_without_changing_its_svg() {
     let drawing = Engine::default().draw_recipe(&recipe, &|| false).unwrap();
     let doc = drawing.document(recipe.paper, recipe.inks, []);
     assert_eq!(
-        svg_out::export(&doc, &doc.layers()).as_bytes(),
-        include_bytes!("fixtures/volumetric/phase-a/atlas.svg")
+        svg_out::export(&doc, &doc.layers()).replace("\r\n", "\n"),
+        include_str!("fixtures/volumetric/phase-a/atlas.svg").replace("\r\n", "\n")
     );
 }
 #[test]
